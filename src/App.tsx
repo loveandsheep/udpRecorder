@@ -1,12 +1,16 @@
 import React from 'react';
-import { IpcSample } from './sample/IpcSample';
+import Menu from './Menu';
+
+const divStyle = {
+  display: 'flex', 
+  overflow: 'none', 
+  width: '100%', 
+}
 
 function App() {
   return (
-    <div>
-      <header className="App-header">
-        <IpcSample/>
-      </header>
+    <div style={divStyle}>
+      <Menu/>
     </div>
   );
 }

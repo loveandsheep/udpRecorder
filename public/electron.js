@@ -1,12 +1,14 @@
-const {app, BrowserWindow} = require('electron')
+const recorder = require('./udpParse');
+const {app, BrowserWindow, dialog} = require('electron')
 const path = require('path')
 const {ipcMain} = require('electron');
 const isDev = require("electron-is-dev");
+let mainWindow;
 
 function createWindow () {
-	const mainWindow = new BrowserWindow({
-		width: 1280,
-		height: 720,
+	mainWindow = new BrowserWindow({
+		width: 600,
+		height: 600,
 		webPreferences: {
 			preload: path.join(__dirname, 'preload.js')
 		}
@@ -34,4 +36,51 @@ app.on('window-all-closed', function () {
 
 ipcMain.handle('eFunc', (e, data) => {
 	console.log(data);
+});
+
+ipcMain.handle('rec', (e, data) => {
+	recorder.rec(mainWindow, data);
+});
+
+ipcMain.handle('stop', (e, data) => {
+	recorder.stop();
+});
+
+ipcMain.handle('play', (e, data) => {
+	recorder.play(mainWindow, data);
+});
+
+ipcMain.handle('loop', (e, data) => {
+	recorder.setLoop(data);
+})
+
+ipcMain.handle('load', (e, data) => {
+	const path = dialog.showOpenDialogSync(mainWindow, {
+		buttonLabel: '読み込み',
+		filters: [
+			{name: 'UDP data', extensions: ['udp']}
+		],
+		properties: [
+			'openFile',
+		]
+	})
+
+	if (path !== undefined)
+	{
+		recorder.load(mainWindow, path[0]);
+	}
+});
+
+ipcMain.handle('save', (e, data) => {
+	const path = dialog.showSaveDialogSync(mainWindow, {
+		buttonLabel: '保存',
+		filters: [
+			{name: 'UDP data', extensions: ['udp']}
+		],
+		properties: [
+			'openFile',
+		]
+	})
+
+	if (path !== undefined) recorder.save(mainWindow, path);
 });
