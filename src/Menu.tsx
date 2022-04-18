@@ -13,7 +13,7 @@ export default function Menu (props: IMenuProps) {
 	const [isPlay, setPlay] = React.useState(false);
 	const [dataSize, setDataSize] = React.useState(0);
 	const [time, setTime] = React.useState(0);
-	const [loop, setLoop] = React.useState(false);
+	const [loop, setLoop] = React.useState(true);
 	const [fileName, setFileName] = React.useState('newFile');
 
 	React.useEffect(() => {

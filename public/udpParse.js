@@ -17,7 +17,7 @@ let dv = new DataView(buffer);
 let u8Arr = new Uint8Array(buffer);
 let dataOffset = 0;
 let totalSize = 0;
-let isLoop = false;
+let isLoop = true;
 
 exports.setLoop = function(l) {
 	isLoop = !l;
