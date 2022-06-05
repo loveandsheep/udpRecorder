@@ -31,7 +31,8 @@ exports.rec = function(mainWindow, prop) {
 	console.log('starting :' + dataOffset);
 	socket.bind(prop.port, () => {
 		console.log('bufSize :' + socket.getRecvBufferSize());
-		socket.setRecvBufferSize(65536 * 10);	
+		socket.setRecvBufferSize(65536 * 100);	
+		console.log('bufSize :' + socket.getRecvBufferSize());
 	});
 
 	clearInterval(dataSizeInt);
@@ -85,21 +86,27 @@ exports.play = function(mainWindow, prop) {
 	}, 100);
 
 	playId = setInterval(() => {
+		//Playからの経過時間を取得
 		const passed = Date.now() - recTime;
+
+		//次のメッセージのデータサイズと、送信時刻を取得
 		let dataSize = dv.getUint16(dataOffset);
 		let lastTime = dv.getUint32(dataOffset + 2);
-
+		
 		while (lastTime <= passed)
 		{
+			//メッセージの内容を切り出し
 			const buf = u8Arr.slice(
 							dataOffset + SIZE_MLEN + SIZE_PASSED, 
 							dataOffset + dataSize);
+			
+			//メッセージを送信
 			socket.send(buf, prop.port, prop.host);
 
+			//次のメッセージ用にデータオフセット
 			dataOffset += dataSize;
 			dataSize = dv.getUint16(dataOffset);
 			lastTime = dv.getUint32(dataOffset + 2);
-			
 			if (dataOffset >= totalSize) break;
 		}
 
@@ -107,6 +114,7 @@ exports.play = function(mainWindow, prop) {
 		{
 			if (isLoop)
 			{
+				//ループの場合頭出し
 				recTime = Date.now();
 				dataOffset = 0;	
 			}
@@ -137,6 +145,7 @@ socket.on('message', (message, remote) => {
 		const passed = now - recTime;
 		const messageLength = SIZE_MLEN + SIZE_PASSED + message.length;
 		
+
 		dv.setUint16(dataOffset, messageLength);
 		dataOffset += SIZE_MLEN;
 		dv.setUint32(dataOffset, passed);
