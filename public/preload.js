@@ -9,10 +9,12 @@ contextBridge.exposeInMainWorld('ipc', {
     load: async(data) => await ipcRenderer.invoke('load', data),
     save: async(data) => await ipcRenderer.invoke('save', data),
     loop: async(data) => await ipcRenderer.invoke('loop', data),
+    routeSet: async(data) => await ipcRenderer.invoke('routeSet', data),
+    routeTable: async(data) => await ipcRenderer.invoke('routeTable', data),
     
     //electron => reaect
     receive: (channel, func) => {
-		let validChannel = ["dataSize", "stop", "time", "fileName"];//function list
+		let validChannel = ["dataSize", "stop", "time", "fileName", "route"];//function list
 		if (validChannel.includes(channel)) {
 			ipcRenderer.on(channel, (event, ...args) => func(...args));
 		}

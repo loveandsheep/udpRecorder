@@ -54,6 +54,12 @@ ipcMain.handle('loop', (e, data) => {
 	recorder.setLoop(data);
 })
 
+ipcMain.handle('routeSet', (e, data) => {
+	//routingを有効にする
+	//有効にできたらreactにtrueを返す
+	mainWindow.webContents.send('route', {enable: data.enable});
+})
+
 ipcMain.handle('load', (e, data) => {
 	const path = dialog.showOpenDialogSync(mainWindow, {
 		buttonLabel: '読み込み',
