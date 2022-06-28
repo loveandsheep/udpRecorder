@@ -5,6 +5,7 @@ import { Box, Button, CircularProgress, IconButton, Paper, TextField, Typography
 import * as React from 'react';
 
 export interface ISpliterProps {
+	index: number,
 }
 
 export type route = {
@@ -24,9 +25,17 @@ export function Spliter (props: ISpliterProps) {
 	const [routing, setRouting] = React.useState(false);
 
 	React.useEffect(() => {
+
 		(window as any).ipc.receive('route', (data:any) => {
 			setRouting(data.enable);
-		})
+		});
+
+		(window as any).ipc.receive('routeTable', (data:any) => {
+			console.log('receive route ipc');
+			setRoute(data.route);
+		});
+
+		(window as any).ipc.splitReady();
 	}, []);
 
 	const reqRouting = () => {
@@ -70,9 +79,13 @@ export function Spliter (props: ISpliterProps) {
 		setRoute(list.concat([]));
 	}
 
+	React.useEffect(() => {
+		(window as any).ipc.routeTable({table: routeList});
+	}, [routeList]);
+
 
 	const boxStyle = {
-		display: 'flex',
+		display: props.index === 0 ? 'flex' : 'none',
 		flexDirection: 'column',
 		justifyContent: 'center',
 		width: '100%',

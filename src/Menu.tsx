@@ -2,6 +2,7 @@ import { Box, Button, Checkbox, CircularProgress, FormControlLabel, FormGroup, P
 import * as React from 'react';
 
 export interface IMenuProps {
+	index: number,
 }
 
 export default function Menu (props: IMenuProps) {
@@ -81,7 +82,7 @@ export default function Menu (props: IMenuProps) {
 	}
 
 	const boxStyle = {
-		display: 'flex',
+		display: (props.index === 1 ? 'flex' : 'none'),
 		flexDirection: 'column',
 		justifyContent: 'center',
 		width: '100%',

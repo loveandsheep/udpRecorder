@@ -1,5 +1,7 @@
 const dgram = require('dgram');
 let socket = dgram.createSocket('udp4');
+const {app} = require('electron')
+const path = require('path')
 const fs = require('fs');
 const { clearInterval } = require('timers');
 
@@ -18,6 +20,51 @@ let u8Arr = new Uint8Array(buffer);
 let dataOffset = 0;
 let totalSize = 0;
 let isLoop = true;
+
+let splitRecv;
+let routeTable = [];
+
+exports.saveRoute = function() {
+	var info_path = path.join(app.getPath("userData"), "routes.json");
+	fs.writeFileSync(info_path, JSON.stringify(routeTable));
+}
+
+exports.loadRoute = function(mainWindow) {
+	var info_path = path.join(app.getPath("userData"), "routes.json");
+	var data;
+	try{
+		data = {route: JSON.parse(fs.readFileSync(info_path, 'utf8'))};
+	}
+	catch{
+		data = {route: []};
+	}
+	mainWindow.webContents.send('routeTable', data);
+}
+
+exports.setTable = function(data) {
+	routeTable = data;
+}
+
+exports.splitReceive = function() {
+	console.log('call splitReceive()');
+	splitRecv = dgram.createSocket('udp4');
+	splitRecv.bind(51000, () => {
+		splitRecv.setRecvBufferSize(65536 * 100);	
+		splitRecv.on('message', (message, remote) => {
+			for (rt of routeTable) {
+				if (rt.srchost == remote.address)
+				{
+					splitRecv.send(message, rt.dstport, rt.dsthost);
+				}
+			}
+		});
+	})
+}
+
+exports.splitClose = function() {
+	console.log('call splitClose()');
+	splitRecv.close();
+}
 
 exports.setLoop = function(l) {
 	isLoop = !l;
